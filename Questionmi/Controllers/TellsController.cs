@@ -45,7 +45,7 @@ namespace Questionmi.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task<ActionResult> Delete([FromQuery(Name = "id"), Required(ErrorMessage = "id is required.")] int id )
         {
             if (!HttpContext.Authorize(_authRepository)) return Unauthorized();

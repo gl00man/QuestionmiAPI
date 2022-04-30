@@ -28,10 +28,14 @@ namespace Questionmi
             services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
             services.AddInMemoryRateLimiting();
 
+            //services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), o => o.CommandTimeout(120)));
+            services.AddCors();
+            services.AddDbContext<DatabaseContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("DefaultConnection"))));
+
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
             services.AddScoped<ITellRepository, TellRepository>();
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
-            services.AddDbContext<DatabaseContext>(o => o.UseSqlite("Data source=questionmi.db"));
+            //services.AddDbContext<DatabaseContext>(o => o.UseSqlite("Data source=questionmi.db"));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
