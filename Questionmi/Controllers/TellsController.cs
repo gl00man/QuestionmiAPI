@@ -33,7 +33,7 @@ namespace Questionmi.Controllers
         [HttpPost]
         public async Task<ActionResult> PostTell([FromBody] TellDto tell)
         {
-            var userIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            var userIp = HttpContext.Request.HttpContext.Connection.RemoteIpAddress.ToString();
             return Ok(await _tellRepository.Create(userIp, tell));
         }
 
