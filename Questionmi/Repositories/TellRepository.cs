@@ -19,28 +19,6 @@ namespace Questionmi.Repositories
             _context = context;
         }
 
-        public async Task<int> Create(string userIp, TellDto tell)
-        {
-            var mappedTell = new Tell
-            {
-                CreatedAt = DateTime.Now,
-                UsersIP = userIp,
-                Text = tell.Text
-            };
-
-            _context.Tells.Add(mappedTell);
-            await _context.SaveChangesAsync();
-
-            return mappedTell.Id;
-        }
-
-        public async Task Delete(int id)
-        {
-            var tellToDelete = await _context.Tells.FindAsync(id);
-            _context.Tells.Remove(tellToDelete);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task<List<Tell>> Get(PaginationParams paginationParams, TellsFilter tellsFilter)
         {
             var queryableTells = _context.Tells.AsQueryable();
@@ -87,6 +65,31 @@ namespace Questionmi.Repositories
                 }).ToListAsync();
         }
 
+        public async Task<int> Create(string userIp, TellDto tell)
+        {
+            if (tell.Text.Length <= 5)
+                throw new Exception("Tell must have more than 5 characters.");
+
+            var similiarTell = _context.Tells
+                .Where(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""))
+                .FirstOrDefault();
+
+            if (similiarTell != null)
+                throw new Exception("Similar tell was posted.");
+
+            var mappedTell = new Tell
+            {
+                CreatedAt = DateTime.Now,
+                UsersIP = userIp,
+                Text = tell.Text
+            };
+
+            _context.Tells.Add(mappedTell);
+            await _context.SaveChangesAsync();
+
+            return mappedTell.Id;
+        }
+
         public async Task Update(Tell tell)
         {
             var tellInDb = _context.Tells
@@ -97,6 +100,13 @@ namespace Questionmi.Repositories
                 throw new Exception($"Tell with id {tell.Id} not found");
 
             _context.Entry(tell).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Delete(int id)
+        {
+            var tellToDelete = await _context.Tells.FindAsync(id);
+            _context.Tells.Remove(tellToDelete);
             await _context.SaveChangesAsync();
         }
     }
