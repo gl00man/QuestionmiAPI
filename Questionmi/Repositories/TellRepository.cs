@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Questionmi.DTOs;
 using Questionmi.Filters;
+using Questionmi.Helpers.Exceptions;
 using Questionmi.Models;
 using SellpanderAPI.Models;
 using System;
@@ -68,14 +69,14 @@ namespace Questionmi.Repositories
         public async Task<int> Create(string userIp, TellDto tell)
         {
             if (tell.Text.Length <= 5)
-                throw new Exception("Tell must have more than 5 characters.");
+                throw new IncorrectDataException("Tell must have more than 5 characters.");
 
             var similiarTell = _context.Tells
                 .Where(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""))
                 .FirstOrDefault();
 
             if (similiarTell != null)
-                throw new Exception("Similar tell was posted.");
+                throw new IncorrectDataException("Similar tell was posted.");
 
             var mappedTell = new Tell
             {
@@ -97,7 +98,7 @@ namespace Questionmi.Repositories
                 .FirstOrDefault();
 
             if (tellInDb == null)
-                throw new Exception($"Tell with id {tell.Id} not found");
+                throw new NotFoundException($"Tell with id {tell.Id} not found");
 
             _context.Entry(tell).State = EntityState.Modified;
             await _context.SaveChangesAsync();
