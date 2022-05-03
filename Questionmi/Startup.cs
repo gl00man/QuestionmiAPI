@@ -31,13 +31,13 @@ namespace Questionmi
             services.AddInMemoryRateLimiting();
 
             services.AddCors();
-            //services.AddDbContext<DatabaseContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("DefaultConnection"))));
+            services.AddDbContext<DatabaseContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("DefaultConnection"))));
 
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
             services.AddScoped<ITellRepository, TellRepository>();
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
             services.AddScoped<ErrorHandlingMiddleware>();
-            services.AddDbContext<DatabaseContext>(o => o.UseSqlite("Data source=questionmi.db"));
+            //services.AddDbContext<DatabaseContext>(o => o.UseSqlite("Data source=questionmi.db"));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
