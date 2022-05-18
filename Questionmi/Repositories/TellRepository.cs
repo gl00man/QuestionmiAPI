@@ -71,9 +71,9 @@ namespace Questionmi.Repositories
             if (tell.Text.Length <= 5)
                 throw new IncorrectDataException("Tell must have more than 5 characters.");
 
-            var similiarTell = _context.Tells
+            var similiarTell = await _context.Tells
                 .Where(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""))
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (similiarTell != null)
                 throw new IncorrectDataException("Similar tell was posted.");
