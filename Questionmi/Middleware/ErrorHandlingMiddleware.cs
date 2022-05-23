@@ -23,10 +23,10 @@ namespace Questionmi.Middleware
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync(e.Message);
             }
-            catch (Exception e)
+            catch
             {
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync(e.Message);
+                await context.Response.WriteAsync("Something went wrong.");
             }
         }
     }

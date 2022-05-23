@@ -7,6 +7,7 @@ using SellpanderAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Questionmi.Repositories
@@ -70,6 +71,12 @@ namespace Questionmi.Repositories
         {
             if (tell.Text.Length <= 5)
                 throw new IncorrectDataException("Tell must have more than 5 characters.");
+
+            if (tell.Text.Length > 1000)
+                throw new IncorrectDataException("Tell can't have more than 1000 characters.");
+
+            if (!Regex.IsMatch(tell.Text, "^[a-zA-z0-9 ,.!#$%&*()-={}\"\'|?>]+$"))
+                throw new IncorrectDataException("Tell has illegall characters.");
 
             var similiarTell = await _context.Tells
                 .Where(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""))
