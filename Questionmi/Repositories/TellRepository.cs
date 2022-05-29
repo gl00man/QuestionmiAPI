@@ -75,7 +75,7 @@ namespace Questionmi.Repositories
             if (tell.Text.Length > 1000)
                 throw new IncorrectDataException("Tell can't have more than 1000 characters.");
 
-            if (!Regex.IsMatch(tell.Text, "^[a-zA-z0-9 ,.!#$%&*()-={}\"\'|?>]+$"))
+            if (!Regex.IsMatch(tell.Text, "^[a-zA-z0-9 ĄąĘęĆćŁłŃńŚśÓóŹźŻż,.!#$%&*()-={}\"\'|?>]+$"))
                 throw new IncorrectDataException("Tell has illegall characters.");
 
             var similiarTell = await _context.Tells
