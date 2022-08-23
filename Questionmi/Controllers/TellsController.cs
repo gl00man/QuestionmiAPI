@@ -30,6 +30,14 @@ namespace Questionmi.Controllers
             return Ok(await _tellRepository.Get(paginationParams, tellsFilter));
         }
 
+        [HttpGet]
+        [Route("/api/GetTellsForPost")]
+        public async Task<ActionResult> GetTellsForPost()
+        {
+            if (!HttpContext.Authorize(_authRepository)) return Unauthorized();
+            return Ok(await _tellRepository.GetForPost());
+        }
+
         [HttpPost]
         public async Task<ActionResult> PostTell([FromBody] TellDto tell)
         {

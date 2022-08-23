@@ -11,5 +11,6 @@ namespace Questionmi.Models
         [JsonPropertyName("users_ip")]
         public string UsersIP { get; set; }
         public string Text { get; set; }
+        public bool IsPosted { get; set; }
     }
 }

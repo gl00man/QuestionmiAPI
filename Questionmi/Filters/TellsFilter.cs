@@ -13,5 +13,7 @@ namespace Questionmi.Filters
         public string Ip { get; set; }
         [FromQuery(Name = "text")]
         public string Text { get; set; }
+        [FromQuery(Name = "is_posted")]
+        public bool? IsPosted { get; set; }
     }
 }

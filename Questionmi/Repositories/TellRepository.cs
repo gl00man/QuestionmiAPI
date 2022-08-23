@@ -54,7 +54,13 @@ namespace Questionmi.Repositories
                 queryableTells = queryableTells
                     .Where(t => t.Text == tellsFilter.Text);
             }
-            
+
+            if (tellsFilter?.IsPosted != null)
+            {
+                queryableTells = queryableTells
+                    .Where(t => t.IsPosted == tellsFilter.IsPosted);
+            }
+
             return await queryableTells
                 .Skip((paginationParams.Page - 1) * paginationParams.ItemsPerPage)
                 .Take(paginationParams.ItemsPerPage)
@@ -65,6 +71,20 @@ namespace Questionmi.Repositories
                     UsersIP = t.UsersIP,
                     Text = t.Text
                 }).ToListAsync();
+        }
+
+        public async Task<List<Tell>> GetForPost()
+        {
+            var tells =  await _context.Tells
+                .Where(x => !x.IsPosted)
+                .OrderBy(x => x.CreatedAt)
+                .ToListAsync();
+
+            tells.ForEach(x => x.IsPosted = true);
+            _context.Tells.UpdateRange(tells);
+            _context.SaveChanges();
+
+            return tells;
         }
 
         public async Task<int> Create(string userIp, TellDto tell)
