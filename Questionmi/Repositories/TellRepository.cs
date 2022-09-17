@@ -61,6 +61,12 @@ namespace Questionmi.Repositories
                     .Where(t => t.IsPosted == tellsFilter.IsPosted);
             }
 
+            if(tellsFilter?.IsWaitingForAccept != null)
+            {
+                queryableTells = queryableTells
+                    .Where(t => t.IsWaitingForAccept == tellsFilter.IsWaitingForAccept);
+            }
+
             return await queryableTells
                 .Skip((paginationParams.Page - 1) * paginationParams.ItemsPerPage)
                 .Take(paginationParams.ItemsPerPage)
@@ -69,18 +75,20 @@ namespace Questionmi.Repositories
                     Id = t.Id,
                     CreatedAt = t.CreatedAt,
                     UsersIP = t.UsersIP,
-                    Text = t.Text
+                    Text = t.Text,
+                    IsPosted = t.IsPosted,
+                    IsWaitingForAccept = t.IsWaitingForAccept
                 }).ToListAsync();
         }
 
         public async Task<List<Tell>> GetForPost()
         {
             var tells =  await _context.Tells
-                .Where(x => !x.IsPosted)
+                .Where(x => !x.IsPosted && !x.IsWaitingForAccept)
                 .OrderBy(x => x.CreatedAt)
                 .ToListAsync();
 
-            tells.ForEach(x => x.IsPosted = true);
+            tells.AsParallel().ForAll(x => x.IsPosted = true);
             _context.Tells.UpdateRange(tells);
             _context.SaveChanges();
 
@@ -98,11 +106,10 @@ namespace Questionmi.Repositories
             if (!Regex.IsMatch(tell.Text, "^[a-zA-z0-9 ĄąĘęĆćŁłŃńŚśÓóŹźŻż,.!#$%&*()-={}\"\'|?>]+$"))
                 throw new IncorrectDataException("Tell has illegall characters.");
 
-            var similiarTell = await _context.Tells
-                .Where(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""))
-                .FirstOrDefaultAsync();
+            var similiarTellPosted = _context.Tells
+                .Any(t => t.Text.ToLower().Replace(" ", "") == tell.Text.ToLower().Replace(" ", ""));
 
-            if (similiarTell != null)
+            if (similiarTellPosted)
                 throw new IncorrectDataException("Similar tell was posted.");
 
             var mappedTell = new Tell
@@ -111,6 +118,12 @@ namespace Questionmi.Repositories
                 UsersIP = userIp,
                 Text = tell.Text
             };
+
+            var badWords = await _context.BadWords.Select(x => x.Word).ToListAsync();
+            var badWordsRegex = new Regex(@"\b(" + string.Join("|", badWords.Select(Regex.Escape).ToArray()) + @"\b)");
+
+            if (Regex.IsMatch(tell.Text, badWordsRegex.ToString()))
+                mappedTell.IsWaitingForAccept = true;
 
             _context.Tells.Add(mappedTell);
             await _context.SaveChangesAsync();

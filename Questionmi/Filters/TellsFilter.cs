@@ -15,5 +15,7 @@ namespace Questionmi.Filters
         public string Text { get; set; }
         [FromQuery(Name = "is_posted")]
         public bool? IsPosted { get; set; }
+        [FromQuery(Name = "is_waiting_for_accept")]
+        public bool? IsWaitingForAccept { get; set; }
     }
 }

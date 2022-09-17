@@ -12,5 +12,6 @@ namespace Questionmi.Models
         public string UsersIP { get; set; }
         public string Text { get; set; }
         public bool IsPosted { get; set; }
+        public bool IsWaitingForAccept { get; set; }
     }
 }
