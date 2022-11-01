@@ -119,7 +119,7 @@ namespace Questionmi.Repositories
                 Text = tell.Text
             };
 
-            var badWords = await _context.BadWords.Select(x => x.Word).ToListAsync();
+            var badWords = await _context.BadWords.Select(x => x.Words).ToListAsync();
             var badWordsRegex = new Regex(@"\b(" + string.Join("|", badWords.Select(Regex.Escape).ToArray()) + @"\b)");
 
             if (Regex.IsMatch(tell.Text, badWordsRegex.ToString()))
